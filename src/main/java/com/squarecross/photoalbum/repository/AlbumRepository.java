@@ -1,6 +1,7 @@
 package com.squarecross.photoalbum.repository;
 
 import com.squarecross.photoalbum.domain.Album;
+import com.squarecross.photoalbum.dto.AlbumDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
