@@ -25,6 +25,7 @@ public class Photo {
     private Long fileSize;
 
     @Column(name = "uploaded_at", unique = false, nullable = true)
+    @CreationTimestamp  //신규 사진파일 DB INSERT시 자동으로 현재 시간을 입력
     private Date uploadedAt;
 
     //Foreign Key
