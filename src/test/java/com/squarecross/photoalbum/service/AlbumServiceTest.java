@@ -1,5 +1,6 @@
 package com.squarecross.photoalbum.service;
 
+import com.squarecross.photoalbum.Constants;
 import com.squarecross.photoalbum.domain.Album;
 import com.squarecross.photoalbum.domain.Photo;
 import com.squarecross.photoalbum.dto.AlbumDto;
@@ -10,6 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -65,5 +70,25 @@ class AlbumServiceTest {
 
         AlbumDto resAlbum = albumService.getAlbum(savedAlbum.getAlbumId());
         assertEquals(4, resAlbum.getCount());
+    }
+
+    @Test
+    void createAlbum() throws IOException {
+        Album album = new Album();
+        album.setAlbumId(555L);
+        album.setAlbumName("테스트");
+        Album savedAlbum = albumRepository.save(album);
+        createAlbumDirectories(album);
+        deleteAlbumDirectories(album);
+    }
+
+    void createAlbumDirectories(Album album) throws IOException {
+        Files.createDirectories(Paths.get(Constants.PATH_PREFIX + "/photos/original/" + album.getAlbumId()));
+        Files.createDirectories(Paths.get(Constants.PATH_PREFIX + "/photos/thumb/" + album.getAlbumId()));
+    }
+
+    void deleteAlbumDirectories(Album album) throws IOException {
+        Files.delete(Paths.get(Constants.PATH_PREFIX + "/photos/original/" + album.getAlbumId()));
+        Files.delete(Paths.get(Constants.PATH_PREFIX + "/photos/thumb/" + album.getAlbumId()));
     }
 }
