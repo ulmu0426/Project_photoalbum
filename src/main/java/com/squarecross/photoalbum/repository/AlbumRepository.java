@@ -13,6 +13,8 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 
 
     List<Album> findByAlbumNameContainingOrderByAlbumNameAsc(String keyword);   //이름순 정렬
+    List<Album> findByAlbumNameContainingOrderByAlbumNameDesc(String keyword);   //이름순 정렬
 
+    List<Album> findByAlbumNameContainingOrderByCreatedAtAsc(String keyword);  //생성날짜 순 정렬
     List<Album> findByAlbumNameContainingOrderByCreatedAtDesc(String keyword);  //생성날짜 순 정렬
 }
