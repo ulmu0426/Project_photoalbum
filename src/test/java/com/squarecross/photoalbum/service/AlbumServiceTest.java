@@ -7,6 +7,7 @@ import com.squarecross.photoalbum.dto.AlbumDto;
 import com.squarecross.photoalbum.mapper.AlbumMapper;
 import com.squarecross.photoalbum.repository.AlbumRepository;
 import com.squarecross.photoalbum.repository.PhotoRepository;
+import org.hibernate.annotations.common.util.impl.Log;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,7 +49,7 @@ class AlbumServiceTest {
     }
 
     @Test
-    void testPhotoCount(){
+    void testPhotoCount() {
         Album album = new Album();
         album.setAlbumName("테스트앨범");
         Album savedAlbum = albumRepository.save(album);
@@ -88,7 +91,33 @@ class AlbumServiceTest {
 
         Files.createDirectories(Paths.get(Constants.PATH_PREFIX + "/photos/original/" + resDto.getAlbumId()));
         Files.createDirectories(Paths.get(Constants.PATH_PREFIX + "/photos/thumb/" + resDto.getAlbumId()));
+
         Files.delete(Paths.get(Constants.PATH_PREFIX + "/photos/original/" + resDto.getAlbumId()));
         Files.delete(Paths.get(Constants.PATH_PREFIX + "/photos/thumb/" + resDto.getAlbumId()));
+    }
+
+    @Test
+    void testAlbumRepository() throws InterruptedException {
+        Album album1 = new Album();
+        Album album2 = new Album();
+        album1.setAlbumName("aaa");
+        album2.setAlbumName("aab");
+
+        albumRepository.save(album1);
+        TimeUnit.MILLISECONDS.sleep(1);
+        albumRepository.save(album2);
+
+        //최신순 정렬 테스트
+        List<Album> resDateSort = albumRepository.findByAlbumNameContainingOrderByCreatedAtDesc("aa");
+        assertEquals("aab", resDateSort.get(0).getAlbumName());
+        assertEquals("aaa", resDateSort.get(1).getAlbumName());
+        assertEquals(2, resDateSort.size());
+
+        //이름순 정렬 테스트
+        List<Album> resNameSort = albumRepository.findByAlbumNameContainingOrderByAlbumNameAsc("aa");
+        assertEquals("aaa", resNameSort.get(0).getAlbumName());
+        assertEquals("aab", resNameSort.get(1).getAlbumName());
+        assertEquals(2, resNameSort.size());
+
     }
 }

@@ -15,7 +15,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AlbumService {
@@ -25,10 +28,10 @@ public class AlbumService {
     @Autowired
     private PhotoRepository photoRepository;
 
-    public AlbumDto getAlbum(Long albumId){
+    public AlbumDto getAlbum(Long albumId) {
         Optional<Album> res = albumRepository.findById(albumId);
         //값이 있는경우에만 반환
-        if(res.isPresent()){
+        if (res.isPresent()) {
             AlbumDto albumDto = AlbumMapper.convertToDto(res.get());
             albumDto.setCount(photoRepository.countByAlbum_AlbumId(albumId));
             return albumDto;
@@ -47,5 +50,24 @@ public class AlbumService {
     private void createAlbumDirectories(Album album) throws IOException {
         Files.createDirectories(Paths.get(Constants.PATH_PREFIX + "/photos/original/" + album.getAlbumId()));
         Files.createDirectories(Paths.get(Constants.PATH_PREFIX + "/photos/thumb/" + album.getAlbumId()));
+    }
+
+    public List<AlbumDto> getAlbumList(String keyword, String sort) {
+        List<Album> albums;
+        if(Objects.equals(sort, "byName")){
+            albums = albumRepository.findByAlbumNameContainingOrderByAlbumNameAsc(keyword);
+        } else if (Objects.equals(sort, "byDate")) {
+            albums = albumRepository.findByAlbumNameContainingOrderByCreatedAtDesc(keyword);
+        } else {
+            throw new IllegalArgumentException("알 수 없는 정렬 기준입니다.");
+        }
+        List<AlbumDto> albumDtoList = AlbumMapper.convertToDtoList(albums);
+
+        for(AlbumDto albumDto : albumDtoList){
+            List<Photo> top4 = photoRepository.findTop4ByAlbum_AlbumIdOrderByUploadedAtDesc(albumDto.getAlbumId());
+            albumDto.setThumbUrls(top4.stream().map(Photo::getThumbUrl).map(c -> Constants.PATH_PREFIX + c).collect(Collectors.toList()));
+        }
+
+        return albumDtoList;
     }
 }
