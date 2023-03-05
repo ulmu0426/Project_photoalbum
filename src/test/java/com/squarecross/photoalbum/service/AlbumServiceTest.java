@@ -7,14 +7,18 @@ import com.squarecross.photoalbum.dto.AlbumDto;
 import com.squarecross.photoalbum.mapper.AlbumMapper;
 import com.squarecross.photoalbum.repository.AlbumRepository;
 import com.squarecross.photoalbum.repository.PhotoRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.format.datetime.DateFormatter;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -74,21 +78,17 @@ class AlbumServiceTest {
 
     @Test
     void createAlbum() throws IOException {
-        Album album = new Album();
-        album.setAlbumId(555L);
-        album.setAlbumName("테스트");
-        Album savedAlbum = albumRepository.save(album);
-        createAlbumDirectories(album);
-        deleteAlbumDirectories(album);
-    }
+        AlbumDto albumDto = new AlbumDto();
+        albumDto.setAlbumName("테스트");
+        AlbumDto resDto = albumService.createAlbum(albumDto);
 
-    void createAlbumDirectories(Album album) throws IOException {
-        Files.createDirectories(Paths.get(Constants.PATH_PREFIX + "/photos/original/" + album.getAlbumId()));
-        Files.createDirectories(Paths.get(Constants.PATH_PREFIX + "/photos/thumb/" + album.getAlbumId()));
-    }
+        assertEquals("테스트", resDto.getAlbumName());
+        assertNotNull(resDto.getAlbumId());
+        assertNotNull(resDto.getCreatedAt());
 
-    void deleteAlbumDirectories(Album album) throws IOException {
-        Files.delete(Paths.get(Constants.PATH_PREFIX + "/photos/original/" + album.getAlbumId()));
-        Files.delete(Paths.get(Constants.PATH_PREFIX + "/photos/thumb/" + album.getAlbumId()));
+        Files.createDirectories(Paths.get(Constants.PATH_PREFIX + "/photos/original/" + resDto.getAlbumId()));
+        Files.createDirectories(Paths.get(Constants.PATH_PREFIX + "/photos/thumb/" + resDto.getAlbumId()));
+        Files.delete(Paths.get(Constants.PATH_PREFIX + "/photos/original/" + resDto.getAlbumId()));
+        Files.delete(Paths.get(Constants.PATH_PREFIX + "/photos/thumb/" + resDto.getAlbumId()));
     }
 }
