@@ -35,4 +35,11 @@ public class AlbumController {
         List<AlbumDto> albumDtoList = albumService.getAlbumList(keyword, sort, orderBy);
         return new ResponseEntity<>(albumDtoList, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/{albumId}", method = RequestMethod.PUT)
+    public ResponseEntity<AlbumDto> putAlbumName(@PathVariable("albumId") final long albumId,
+                                                 @RequestBody final AlbumDto albumDto){
+        AlbumDto res = albumService.changeName(albumId, albumDto);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
 }

@@ -5,17 +5,17 @@ import com.squarecross.photoalbum.domain.Album;
 import com.squarecross.photoalbum.domain.Photo;
 import com.squarecross.photoalbum.dto.AlbumDto;
 import com.squarecross.photoalbum.mapper.AlbumMapper;
-import com.squarecross.photoalbum.repository.PhotoRepository;
-import org.springframework.stereotype.Service;
 import com.squarecross.photoalbum.repository.AlbumRepository;
+import com.squarecross.photoalbum.repository.PhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -75,5 +75,17 @@ public class AlbumService {
         }
 
         return albumDtoList;
+    }
+
+    public AlbumDto changeName(Long AlbumId, AlbumDto albumDto){
+        Optional<Album> album = this.albumRepository.findById(AlbumId);
+        if (album.isEmpty()){
+            throw new NoSuchElementException(String.format("Album ID '%d'가 존재하지 않습니다", AlbumId));
+        }
+
+        Album updateAlbum = album.get();
+        updateAlbum.setAlbumName(albumDto.getAlbumName());
+        Album savedAlbum = this.albumRepository.save(updateAlbum);
+        return AlbumMapper.convertToDto(savedAlbum);
     }
 }
