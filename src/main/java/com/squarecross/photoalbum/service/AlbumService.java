@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -94,12 +95,46 @@ public class AlbumService {
         if (album.isEmpty()){
             throw new NoSuchElementException(String.format("Album ID '%d'가 존재하지 않습니다", AlbumId));
         }
-        deleteAlbumDirectories(album.get());
+
+        String originPath = Constants.PATH_PREFIX + "/photos/original/" + album.get().getAlbumId();
+        String thumbPath = Constants.PATH_PREFIX + "/photos/thumb/" + album.get().getAlbumId();
+
+        File originD = new File(originPath);
+        File thumbD = new File(thumbPath);
+
+        deleteOriginal(originD);
+        deleteOriginal(thumbD);
+
         this.albumRepository.delete(album.get());
     }
 
-    private void deleteAlbumDirectories(Album album) throws IOException {
-        Files.delete(Paths.get(Constants.PATH_PREFIX + "/photos/original/" + album.getAlbumId()));
-        Files.delete(Paths.get(Constants.PATH_PREFIX + "/photos/thumb/" + album.getAlbumId()));
+    private boolean deleteOriginal(File originalPath) throws IOException {
+        if(!originalPath.exists()){
+            return false;
+        }
+        File[] files = originalPath.listFiles();
+        for(File file : files){
+            if(file.isDirectory()){
+                deleteThumb(file);
+            }else {
+                file.delete();
+            }
+        }
+        return originalPath.delete();
+    }
+
+    private boolean deleteThumb(File thumbPath) throws IOException {
+        if(!thumbPath.exists()){
+            return false;
+        }
+        File[] files = thumbPath.listFiles();
+        for(File file : files){
+            if(file.isDirectory()){
+                deleteThumb(file);
+            }else {
+                file.delete();
+            }
+        }
+        return thumbPath.delete();
     }
 }

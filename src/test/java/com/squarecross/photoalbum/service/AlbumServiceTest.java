@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.CascadeType;
+import javax.persistence.OneToMany;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -138,15 +140,37 @@ class AlbumServiceTest {
     @Test
     void testDeleteAlbum() throws IOException {
         //앨범 생성
-        AlbumDto albumDto = new AlbumDto();
-        albumDto.setAlbumName("신규앨범");
-        AlbumDto res = albumService.createAlbum(albumDto);
+        Album album = new Album();
+        album.setAlbumName("테스트앨범");
+        Album savedAlbum = albumRepository.save(album);
 
-        Long albumId = res.getAlbumId(); // 생성된 앨범 아이디 추출
+        Photo photo1 = new Photo();
+        photo1.setFileName("사진1");
+        photo1.setAlbum(savedAlbum);
+        photoRepository.save(photo1);
+
+        Photo photo2 = new Photo();
+        photo2.setFileName("사진2");
+        photo2.setAlbum(savedAlbum);
+        photoRepository.save(photo2);
+
+        Photo photo3 = new Photo();
+        photo3.setFileName("사진3");
+        photo3.setAlbum(savedAlbum);
+        photoRepository.save(photo3);
+
+        Photo photo4 = new Photo();
+        photo4.setFileName("사진4");
+        photo4.setAlbum(savedAlbum);
+        photoRepository.save(photo4);
+
+        AlbumDto resAlbum = albumService.getAlbum(savedAlbum.getAlbumId());
+
+        Long albumId = resAlbum.getAlbumId(); // 생성된 앨범 아이디 추출
         albumService.deleteAlbum(albumId);
 
-        Optional<Album> album = this.albumRepository.findById(albumId);
+        Optional<Album> res = this.albumRepository.findById(albumId);
         //앨범명 변경되었는지 확인
-        assertTrue(album.isEmpty());
+        assertTrue(res.isEmpty());
     }
 }
