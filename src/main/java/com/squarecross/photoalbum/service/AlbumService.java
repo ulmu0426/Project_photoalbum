@@ -88,4 +88,18 @@ public class AlbumService {
         Album savedAlbum = this.albumRepository.save(updateAlbum);
         return AlbumMapper.convertToDto(savedAlbum);
     }
+
+    public void deleteAlbum(Long AlbumId) throws IOException {
+        Optional<Album> album = this.albumRepository.findById(AlbumId);
+        if (album.isEmpty()){
+            throw new NoSuchElementException(String.format("Album ID '%d'가 존재하지 않습니다", AlbumId));
+        }
+        deleteAlbumDirectories(album.get());
+        this.albumRepository.delete(album.get());
+    }
+
+    private void deleteAlbumDirectories(Album album) throws IOException {
+        Files.delete(Paths.get(Constants.PATH_PREFIX + "/photos/original/" + album.getAlbumId()));
+        Files.delete(Paths.get(Constants.PATH_PREFIX + "/photos/thumb/" + album.getAlbumId()));
+    }
 }

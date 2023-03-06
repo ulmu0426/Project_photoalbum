@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -132,5 +133,20 @@ class AlbumServiceTest {
 
         //앨범명 변경되었는지 확인
         assertEquals("변경후", updatedDto.getAlbumName());
+    }
+
+    @Test
+    void testDeleteAlbum() throws IOException {
+        //앨범 생성
+        AlbumDto albumDto = new AlbumDto();
+        albumDto.setAlbumName("신규앨범");
+        AlbumDto res = albumService.createAlbum(albumDto);
+
+        Long albumId = res.getAlbumId(); // 생성된 앨범 아이디 추출
+        albumService.deleteAlbum(albumId);
+
+        Optional<Album> album = this.albumRepository.findById(albumId);
+        //앨범명 변경되었는지 확인
+        assertTrue(album.isEmpty());
     }
 }
