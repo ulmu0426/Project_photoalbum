@@ -8,10 +8,10 @@ public class AlbumDto {
 
     //AlbumId, AlbumName, CreatedAt, Count 정보를 담음
 
-    Long albumId;
-    String albumName;
-    Date createdAt;
-    int count;
+    private Long albumId;
+    private String albumName;
+    private Date createdAt;
+    private int count;
 
     private List<String> thumbUrls;
 

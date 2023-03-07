@@ -22,7 +22,7 @@ public class Photo {
     private String originalUrl;
 
     @Column(name = "file_size", unique = false, nullable = true)
-    private Long fileSize;
+    private int fileSize;
 
     @Column(name = "uploaded_at", unique = false, nullable = true)
     @CreationTimestamp  //신규 사진파일 DB INSERT시 자동으로 현재 시간을 입력
@@ -67,11 +67,11 @@ public class Photo {
         this.originalUrl = originalUrl;
     }
 
-    public Long getFileSize() {
+    public int getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(Long fileSize) {
+    public void setFileSize(int fileSize) {
         this.fileSize = fileSize;
     }
 
