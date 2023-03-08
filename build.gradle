@@ -28,6 +28,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'org.hibernate:hibernate-search:5.11.1.Final'
+
+	implementation 'org.imgscalr:imgscalr-lib:4.2'	//이미지를 300x300으로 resize 해주는 lib
+
+	//Apache Tika	- 확장자 유효성 체크 lib
+	implementation 'org.apache.tika:tika-core:2.7.0'
+	implementation 'org.apache.tika:tika-parsers-standard-package:2.7.0'
 }
 
 tasks.named('test') {
