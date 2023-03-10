@@ -8,6 +8,9 @@ import com.squarecross.photoalbum.repository.AlbumRepository;
 import com.squarecross.photoalbum.repository.PhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class PhotoMapper {
 
     public static PhotoDto convertToDto(Photo photo){
@@ -18,6 +21,11 @@ public class PhotoMapper {
         photoDto.setOriginalUrl(photo.getOriginalUrl());
         photoDto.setThumbUrl(photo.getThumbUrl());
         photoDto.setUploadedAt(photo.getUploadedAt());
+        photoDto.setAlbumId(photo.getAlbum().getAlbumId());
         return photoDto;
+    }
+
+    public static List<PhotoDto> convertToDtoList(List<Photo> photos) {
+        return photos.stream().map(PhotoMapper::convertToDto).collect(Collectors.toList());
     }
 }

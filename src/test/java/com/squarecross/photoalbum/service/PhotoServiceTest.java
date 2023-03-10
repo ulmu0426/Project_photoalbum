@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -29,5 +32,29 @@ class PhotoServiceTest {
 
         PhotoDto resPhoto = photoService.getPhoto(savedPhoto.getPhotoId());
         assertEquals("테스트", resPhoto.getFileName());
+    }
+
+    @Test
+    void getPhotoList() throws InterruptedException {
+        Photo photo1 = new Photo();
+        Photo photo2 = new Photo();
+        photo1.setFileName("aaa");
+        photo2.setFileName("aab");
+
+        photoRepository.save(photo1);
+        TimeUnit.MILLISECONDS.sleep(1);
+        photoRepository.save(photo2);
+
+        //이름순 정렬 테스트
+        List<Photo> resDataSort = photoRepository.findByFileNameContainingOrderByFileNameDesc("aa");
+        assertEquals("aab", resDataSort.get(0).getFileName());
+        assertEquals("aaa", resDataSort.get(1).getFileName());
+        assertEquals(2,resDataSort.size());
+
+        //최신순 정렬 테스트
+        List<Photo> resNameSort = photoRepository.findByFileNameContainingOrderByUploadedAtDesc("aa");
+        assertEquals("aab", resNameSort.get(0).getFileName());
+        assertEquals("aaa", resNameSort.get(1).getFileName());
+        assertEquals(2,resNameSort.size());
     }
 }
