@@ -1,5 +1,6 @@
 package com.squarecross.photoalbum.controller;
 
+import com.squarecross.photoalbum.domain.Photo;
 import com.squarecross.photoalbum.dto.PhotoDto;
 import com.squarecross.photoalbum.service.PhotoService;
 import org.apache.commons.io.IOUtils;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -93,5 +95,12 @@ public class PhotoController {
                                                        @RequestParam(value = "orderBy", required = false, defaultValue = "desc") final String orderBy){
         List<PhotoDto> photoDtoList = photoService.getPhotoList(keyword, sort, orderBy);
         return new ResponseEntity<>(photoDtoList, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.DELETE)
+    public ResponseEntity<List<PhotoDto>> deletePhotos(@RequestBody PhotoDto photoDto){
+        List<PhotoDto> photoList = photoService.deletePhoto(photoDto.getPhotosIds());
+
+        return new ResponseEntity<>(photoList, HttpStatus.OK);
     }
 }

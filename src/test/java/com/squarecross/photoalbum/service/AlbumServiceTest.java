@@ -170,7 +170,7 @@ class AlbumServiceTest {
         albumService.deleteAlbum(albumId);
 
         Optional<Album> res = this.albumRepository.findById(albumId);
-        //앨범명 변경되었는지 확인
+        //앨범이 삭제됐는지 확인
         assertTrue(res.isEmpty());
     }
 }

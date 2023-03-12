@@ -22,10 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PhotoService {
@@ -149,6 +146,28 @@ public class PhotoService {
         }
         List<PhotoDto> photoDtoList = PhotoMapper.convertToDtoList(photos);
 
+        return photoDtoList;
+    }
+
+    public List<PhotoDto> deletePhoto(List<Long> photosId) {
+        for (Long photoId : photosId){
+            Optional<Photo> photo = this.photoRepository.findById(photoId);
+            if (photo.isEmpty()){
+                throw new NoSuchElementException(String.format("Album ID '%d'가 존재하지 않습니다", photo));
+            }
+
+            String originPath = Constants.PATH_PREFIX + photo.get().getOriginalUrl();
+            String thumbPath = Constants.PATH_PREFIX + photo.get().getThumbUrl();
+
+            File originD = new File(originPath);
+            File thumbD = new File(thumbPath);
+
+            this.photoRepository.delete(photo.get());
+            originD.delete();
+            thumbD.delete();
+        }
+
+        List<PhotoDto> photoDtoList = PhotoMapper.convertToDtoList(photoRepository.findAll());
         return photoDtoList;
     }
 }

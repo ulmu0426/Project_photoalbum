@@ -102,39 +102,24 @@ public class AlbumService {
         File originD = new File(originPath);
         File thumbD = new File(thumbPath);
 
-        deleteOriginal(originD);
-        deleteOriginal(thumbD);
+        deleteRecursion(originD);
+        deleteRecursion(thumbD);
 
         this.albumRepository.delete(album.get());
     }
 
-    private boolean deleteOriginal(File originalPath) throws IOException {
+    private boolean deleteRecursion(File originalPath) throws IOException {
         if(!originalPath.exists()){
             return false;
         }
         File[] files = originalPath.listFiles();
         for(File file : files){
             if(file.isDirectory()){
-                deleteThumb(file);
+                deleteRecursion(file);
             }else {
                 file.delete();
             }
         }
         return originalPath.delete();
-    }
-
-    private boolean deleteThumb(File thumbPath) throws IOException {
-        if(!thumbPath.exists()){
-            return false;
-        }
-        File[] files = thumbPath.listFiles();
-        for(File file : files){
-            if(file.isDirectory()){
-                deleteThumb(file);
-            }else {
-                file.delete();
-            }
-        }
-        return thumbPath.delete();
     }
 }
