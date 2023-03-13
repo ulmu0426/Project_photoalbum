@@ -182,13 +182,13 @@ public class PhotoService {
             System.out.print(photo.get().getOriginalUrl());
             Photo updatedPhoto = photo.get();
             Path fromPathOriginal = Paths.get(Constants.PATH_PREFIX + photo.get().getOriginalUrl());
-            Path fromPathThumb = Paths.get(Constants.PATH_PREFIX + photo.get().getOriginalUrl());
+            Path fromPathThumb = Paths.get(Constants.PATH_PREFIX + photo.get().getThumbUrl());
             updatedPhoto.setOriginalUrl("/photos/original/" + toAlbumId + "/" +photo.get().getFileName());
             updatedPhoto.setThumbUrl("/photos/thumb/" + toAlbumId + "/" +photo.get().getFileName());
             Optional<Album> album = albumRepository.findById(toAlbumId);
             updatedPhoto.setAlbum(album.get());
             moveToFile(fromPathOriginal, Paths.get(Constants.PATH_PREFIX + updatedPhoto.getOriginalUrl()));
-            moveToFile(fromPathThumb, Paths.get(updatedPhoto.getThumbUrl()));
+            moveToFile(fromPathThumb, Paths.get(Constants.PATH_PREFIX + updatedPhoto.getThumbUrl()));
 
             Photo savedPhoto = this.photoRepository.save(updatedPhoto);
 
