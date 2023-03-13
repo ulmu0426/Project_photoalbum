@@ -12,7 +12,7 @@ public class PhotoDto {
     private Date uploadedAt;
     private Long albumId;
 
-    private List<Long> photosIds;
+    private List<Long> photosIds;   //selected photo delete or move
 
     public Long getPhotoId() {
         return photoId;

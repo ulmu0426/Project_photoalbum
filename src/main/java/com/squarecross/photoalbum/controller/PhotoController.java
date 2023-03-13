@@ -2,6 +2,7 @@ package com.squarecross.photoalbum.controller;
 
 import com.squarecross.photoalbum.domain.Photo;
 import com.squarecross.photoalbum.dto.PhotoDto;
+import com.squarecross.photoalbum.dto.PhotoDtoMove;
 import com.squarecross.photoalbum.service.PhotoService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,5 +103,11 @@ public class PhotoController {
         List<PhotoDto> photoList = photoService.deletePhoto(photoDto.getPhotosIds());
 
         return new ResponseEntity<>(photoList, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/move", method = RequestMethod.PUT)
+    public ResponseEntity<List<PhotoDto>> movePhotos(@RequestBody PhotoDtoMove photoDto){
+        List<PhotoDto> photoDtoList = photoService.movePhotos(photoDto.getToAlbumId(), photoDto.getPhotosIds());
+        return new ResponseEntity<>(photoDtoList, HttpStatus.OK);
     }
 }

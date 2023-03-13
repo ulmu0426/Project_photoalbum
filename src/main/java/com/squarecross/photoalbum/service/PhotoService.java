@@ -4,6 +4,7 @@ import com.squarecross.photoalbum.Constants;
 import com.squarecross.photoalbum.domain.Album;
 import com.squarecross.photoalbum.domain.Photo;
 import com.squarecross.photoalbum.dto.PhotoDto;
+import com.squarecross.photoalbum.dto.PhotoDtoMove;
 import com.squarecross.photoalbum.mapper.PhotoMapper;
 import com.squarecross.photoalbum.repository.AlbumRepository;
 import com.squarecross.photoalbum.repository.PhotoRepository;
@@ -153,7 +154,7 @@ public class PhotoService {
         for (Long photoId : photosId){
             Optional<Photo> photo = this.photoRepository.findById(photoId);
             if (photo.isEmpty()){
-                throw new NoSuchElementException(String.format("Album ID '%d'가 존재하지 않습니다", photo));
+                throw new NoSuchElementException(String.format("Photo ID '%d'가 존재하지 않습니다", photo.get().getPhotoId()));
             }
 
             String originPath = Constants.PATH_PREFIX + photo.get().getOriginalUrl();
@@ -169,5 +170,39 @@ public class PhotoService {
 
         List<PhotoDto> photoDtoList = PhotoMapper.convertToDtoList(photoRepository.findAll());
         return photoDtoList;
+    }
+
+    public List<PhotoDto> movePhotos(Long toAlbumId, List<Long> photosId) {
+        List<PhotoDto> photoDtoList = new ArrayList<>();
+        for (Long photoId : photosId){
+            Optional<Photo> photo = this.photoRepository.findById(photoId);
+            if (photo.isEmpty()){
+                throw new NoSuchElementException(String.format("Photo ID '%d'가 존재하지 않습니다", photo.get().getPhotoId()));
+            }
+            System.out.print(photo.get().getOriginalUrl());
+            Photo updatedPhoto = photo.get();
+            Path fromPathOriginal = Paths.get(Constants.PATH_PREFIX + photo.get().getOriginalUrl());
+            Path fromPathThumb = Paths.get(Constants.PATH_PREFIX + photo.get().getOriginalUrl());
+            updatedPhoto.setOriginalUrl("/photos/original/" + toAlbumId + "/" +photo.get().getFileName());
+            updatedPhoto.setThumbUrl("/photos/thumb/" + toAlbumId + "/" +photo.get().getFileName());
+            Optional<Album> album = albumRepository.findById(toAlbumId);
+            updatedPhoto.setAlbum(album.get());
+            moveToFile(fromPathOriginal, Paths.get(Constants.PATH_PREFIX + updatedPhoto.getOriginalUrl()));
+            moveToFile(fromPathThumb, Paths.get(updatedPhoto.getThumbUrl()));
+
+            Photo savedPhoto = this.photoRepository.save(updatedPhoto);
+
+            photoDtoList.add(PhotoMapper.convertToDto(savedPhoto));
+        }
+
+        return photoDtoList;
+    }
+
+    private void moveToFile(Path fromPhoto, Path toPhoto){
+        try {
+            Files.move(fromPhoto, toPhoto);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 }
